@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form
 import shutil
-from api.mock_predict import mock_predict
+from core.inference import predict
 
 app = FastAPI()
 
@@ -12,5 +12,5 @@ async def predict_api(
     image_path = f"temp_{image.filename}"
     with open(image_path, "wb") as f:
          f.write(await image.read())
-    triage_level = mock_predict(image_path, text)
+    triage_level = predict(image_path, text)
     return {"triage_level": triage_level}
