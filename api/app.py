@@ -12,5 +12,5 @@ async def predict_api(
     image_path = f"temp_{image.filename}"
     with open(image_path, "wb") as f:
         shutil.copyfileobj(image.file, f)
-
-    return {"triage_level": predict(image_path, text)}
+    triage_level = predict(image_path, text)
+    return {"triage_level": triage_level)}
