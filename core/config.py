@@ -16,7 +16,7 @@ MODEL_WEIGHTS_PATH = os.path.join(
 )
 
 # -------- Runtime --------
-DEVICE = torch.device("cpu")  # keep CPU for now
+device = torch.device("cpu")  # keep CPU for now
 
 # -------- Model settings --------
 NUM_CLASSES = 3
