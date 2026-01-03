@@ -1,10 +1,11 @@
-torch
 --extra-index-url https://download.pytorch.org/whl/cpu
 
-torch==2.1.2
-torchvision==0.16.2
-transformers
+torch==2.0.1
+torchvision==0.15.2
+
+transformers==4.36.2
 numpy
 pillow
 opencv-python-headless
-gradio
+gradio==4.15.0
+
