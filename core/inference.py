@@ -1,33 +1,39 @@
-import os
+# core/inference.py
+
 import torch
+from core.config import MODEL_WEIGHTS_PATH, device, NUM_CLASSES
 from models.fusion_model import MultimodalTriageModel
+from preprocessing.image_preprocess import preprocess_image
+from preprocessing.text_preprocess import preprocess_text
 
-device = torch.device("cpu")
+# Load model ONCE
+model = MultimodalTriageModel(num_classes=NUM_CLASSES)
+state_dict = torch.load(MODEL_WEIGHTS_PATH, map_location=device)
+model.load_state_dict(state_dict)
+model.to(device)
+model.eval()
 
-_model = None
 
-def load_model():
-    global _model
+def predict(image_path: str, text: str) -> int:
+    """
+    Run multimodal inference and return triage level
+    """
 
-    if _model is not None:
-        return _model
+    # preprocess image
+    image_tensor = preprocess_image(image_path).to(device)
 
-    # 🔹 Absolute path based on THIS file location
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # preprocess text
+    input_ids, attention_mask = preprocess_text(text)
+    input_ids = input_ids.to(device)
+    attention_mask = attention_mask.to(device)
 
-    WEIGHTS_PATH = os.path.join(
-        BASE_DIR,
-        "weights",
-        "best_multimodal_model.pt"
-    )
+    # inference
+    with torch.no_grad():
+        outputs = model(
+            image_tensor.unsqueeze(0),
+            input_ids.unsqueeze(0),
+            attention_mask.unsqueeze(0)
+        )
 
-    print("Loading weights from:", WEIGHTS_PATH)
-    print("File exists:", os.path.exists(WEIGHTS_PATH))
+    return int(outputs.argmax(dim=1).item())
 
-    model = MultimodalTriageModel(num_classes=3)
-    state_dict = torch.load(WEIGHTS_PATH, map_location=device)
-    model.load_state_dict(state_dict)
-    model.eval()
-
-    _model = model
-    return _model
